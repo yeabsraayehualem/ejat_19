@@ -9,7 +9,7 @@ export class EventOverallDashboard extends Component {
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({ data: null, loading: true, error: null, eventId: false });
+        this.state = useState({ data: null, loading: true, error: null, eventId: false, eventQuery: "", eventDropdownOpen: false });
         onWillStart(() => this.loadDashboard());
     }
 
@@ -29,9 +29,55 @@ export class EventOverallDashboard extends Component {
         }
     }
 
-    async onEventChange(event) {
-        this.state.eventId = event.target.value ? Number(event.target.value) : false;
+    get filteredEvents() {
+        const query = this.state.eventQuery.trim().toLowerCase();
+        return (this.state.data?.events || []).filter((event) =>
+            !query || event.name.toLowerCase().includes(query)
+        );
+    }
+
+    onEventFocus(event) {
+        this.state.eventDropdownOpen = true;
+        event.currentTarget.select();
+    }
+
+    onEventSearchInput(event) {
+        this.state.eventQuery = event.currentTarget.value;
+        this.state.eventDropdownOpen = true;
+    }
+
+    onEventBlur() {
+        this.state.eventDropdownOpen = false;
+    }
+
+    keepEventDropdownOpen(event) {
+        event.preventDefault();
+    }
+
+    async chooseEvent(event) {
+        const eventId = event.currentTarget.dataset.eventId;
+        this.state.eventId = eventId ? Number(eventId) : false;
+        const selectedEvent = (this.state.data?.events || []).find(
+            (item) => item.id === this.state.eventId
+        );
+        this.state.eventQuery = selectedEvent?.name || "";
+        this.state.eventDropdownOpen = false;
         await this.loadDashboard();
+    }
+
+    async onEventKeydown(event) {
+        if (event.key === "Escape") {
+            this.state.eventDropdownOpen = false;
+        } else if (event.key === "Enter") {
+            event.preventDefault();
+            if (this.filteredEvents.length === 1) {
+                const first = this.filteredEvents[0];
+                this.state.eventId = first.id;
+                this.state.eventQuery = first.name;
+                this.state.eventDropdownOpen = false;
+                await this.loadDashboard();
+            }
+        }
     }
 
     async refresh() {

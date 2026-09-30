@@ -20,7 +20,7 @@ services:
     depends_on:
       - db
     ports:
-      - "9983:8069"
+      - "8969:8069"
     volumes:
       - ./odoo_data:/var/lib/odoo
     restart: always

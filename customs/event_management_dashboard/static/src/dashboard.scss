@@ -18,7 +18,37 @@
 
 .o_ems_eyebrow { color: #5368d8; font-size: 11px; font-weight: 800; letter-spacing: .13em; }
 .o_ems_dashboard_controls { display: flex; align-items: center; gap: 10px; }
-.o_ems_dashboard_controls select { min-width: 220px; }
+.o_ems_event_picker { position: relative; min-width: 250px; }
+.o_ems_event_picker > input { padding-right: 34px; background: #fff; }
+.o_ems_event_search_icon { position: absolute; top: 11px; right: 12px; color: #8a93a4; pointer-events: none; }
+.o_ems_event_options {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 5px;
+    border: 1px solid #e4e8f0;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(28, 39, 66, .14);
+}
+.o_ems_event_option {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #465168;
+    text-align: left;
+}
+.o_ems_event_option:hover, .o_ems_event_option.is-selected { background: #f0f3ff; color: #4c61cf; }
+.o_ems_event_no_results { padding: 12px 10px; color: #8a93a4; font-size: 12px; }
 .o_ems_loading, .o_ems_empty { padding: 32px; text-align: center; color: #7a8497; }
 
 .o_ems_kpi_grid {
@@ -78,7 +108,7 @@
 @media (max-width: 800px) {
     .o_ems_dashboard_header { align-items: flex-start; flex-direction: column; }
     .o_ems_dashboard_controls { width: 100%; }
-    .o_ems_dashboard_controls select { flex: 1; min-width: 0; }
+    .o_ems_event_picker { flex: 1; min-width: 0; }
     .o_ems_chart_grid { grid-template-columns: 1fr; }
     .o_ems_kpi_grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

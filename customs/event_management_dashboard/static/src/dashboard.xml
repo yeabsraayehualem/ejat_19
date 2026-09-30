@@ -9,12 +9,47 @@
                     <p>One view of planning, participation, attendance, badges, and technical support.</p>
                 </div>
                 <div class="o_ems_dashboard_controls">
-                    <select class="form-select" t-on-change="onEventChange" aria-label="Filter by event">
-                        <option value="">All accessible events</option>
-                        <t t-foreach="state.data?.events || []" t-as="event" t-key="event.id">
-                            <option t-att-value="event.id" t-att-selected="state.eventId === event.id"><t t-esc="event.name"/></option>
-                        </t>
-                    </select>
+                    <div class="o_ems_event_picker">
+                        <input class="form-control"
+                               type="search"
+                               autocomplete="off"
+                               placeholder="Search events…"
+                               aria-label="Search and filter events"
+                               role="combobox"
+                               aria-autocomplete="list"
+                               t-att-aria-expanded="state.eventDropdownOpen"
+                               t-att-value="state.eventQuery"
+                               t-on-focus="onEventFocus"
+                               t-on-input="onEventSearchInput"
+                               t-on-blur="onEventBlur"
+                               t-on-keydown="onEventKeydown"/>
+                        <i class="fa fa-search o_ems_event_search_icon"/>
+                        <div t-if="state.eventDropdownOpen" class="o_ems_event_options" role="listbox">
+                            <button type="button"
+                                    t-attf-class="o_ems_event_option {{ !state.eventId ? 'is-selected' : '' }}"
+                                    role="option"
+                                    t-att-aria-selected="!state.eventId"
+                                    data-event-id=""
+                                    t-on-mousedown="keepEventDropdownOpen"
+                                    t-on-click="chooseEvent">
+                                <span>All accessible events</span>
+                                <i t-if="!state.eventId" class="fa fa-check"/>
+                            </button>
+                            <t t-foreach="filteredEvents" t-as="event" t-key="event.id">
+                                <button type="button"
+                                        t-attf-class="o_ems_event_option {{ state.eventId === event.id ? 'is-selected' : '' }}"
+                                        role="option"
+                                        t-att-aria-selected="state.eventId === event.id"
+                                        t-att-data-event-id="event.id"
+                                        t-on-mousedown="keepEventDropdownOpen"
+                                        t-on-click="chooseEvent">
+                                    <span t-esc="event.name"/>
+                                    <i t-if="state.eventId === event.id" class="fa fa-check"/>
+                                </button>
+                            </t>
+                            <div t-if="!filteredEvents.length" class="o_ems_event_no_results">No matching events</div>
+                        </div>
+                    </div>
                     <button class="btn btn-outline-secondary" t-on-click="refresh" title="Refresh dashboard">
                         <i class="fa fa-refresh"/> Refresh
                     </button>
