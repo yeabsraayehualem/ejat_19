@@ -1,0 +1,85 @@
+.o_ems_dashboard {
+    min-height: 100%;
+    padding: 28px clamp(16px, 3vw, 40px) 48px;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+.o_ems_dashboard_header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+
+    h1 { margin: 4px 0 6px; font-size: clamp(25px, 2.5vw, 34px); font-weight: 750; letter-spacing: -0.04em; }
+    p { margin: 0; color: #778197; }
+}
+
+.o_ems_eyebrow { color: #5368d8; font-size: 11px; font-weight: 800; letter-spacing: .13em; }
+.o_ems_dashboard_controls { display: flex; align-items: center; gap: 10px; }
+.o_ems_dashboard_controls select { min-width: 220px; }
+.o_ems_loading, .o_ems_empty { padding: 32px; text-align: center; color: #7a8497; }
+
+.o_ems_kpi_grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.o_ems_kpi_card, .o_ems_panel {
+    border: 1px solid #e9edf4;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(28, 39, 66, .035);
+}
+
+.o_ems_kpi_card { display: flex; align-items: center; gap: 13px; min-height: 105px; padding: 17px; }
+.o_ems_kpi_icon { display: grid; flex: 0 0 42px; width: 42px; height: 42px; place-items: center; border-radius: 12px; font-size: 17px; }
+.tone-blue { color: #4663d7; background: #edf1ff; }
+.tone-purple { color: #8554c7; background: #f4edff; }
+.tone-teal { color: #118b8d; background: #e8f8f6; }
+.tone-red { color: #d64f5f; background: #fff0f1; }
+.tone-green { color: #21865b; background: #eaf8ef; }
+.tone-orange { color: #c77c27; background: #fff5e8; }
+.o_ems_kpi_text { display: flex; min-width: 0; flex-direction: column; }
+.o_ems_kpi_text span { color: #778197; font-size: 12px; }
+.o_ems_kpi_text strong { margin-top: 2px; font-size: 25px; line-height: 1.15; }
+.o_ems_kpi_text small { margin-top: 4px; color: #8a93a4; font-size: 11px; }
+
+.o_ems_chart_grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 18px; }
+.o_ems_panel { padding: 20px 22px; }
+.o_ems_panel_heading { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.o_ems_panel_heading h2 { margin: 0 0 4px; font-size: 16px; font-weight: 700; }
+.o_ems_panel_heading p { margin: 0; color: #8a93a4; font-size: 12px; }
+.o_ems_panel_icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; color: #6474c9; background: #f0f2ff; }
+.o_ems_bar_row + .o_ems_bar_row { margin-top: 14px; }
+.o_ems_bar_label { display: flex; justify-content: space-between; margin-bottom: 6px; color: #626d81; font-size: 12px; }
+.o_ems_bar_label b { color: #202a3d; font-weight: 700; }
+.o_ems_bar_track { overflow: hidden; width: 100%; height: 8px; border-radius: 9px; background: #eef1f6; }
+.o_ems_bar_fill { height: 100%; min-width: 0; border-radius: inherit; transition: width .25s ease; }
+.fill-blue { background: #6578e8; }
+.fill-purple { background: #a179d3; }
+.fill-teal { background: #31aaa5; }
+.fill-red { background: #e35c68; }
+.fill-orange { background: #e5a34f; }
+.fill-green { background: #36ad78; }
+.o_ems_events_panel { padding-bottom: 8px; }
+.o_ems_events_table { margin-bottom: 0; font-size: 13px; }
+.o_ems_events_table thead th { color: #8992a4; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.o_ems_events_table td, .o_ems_events_table th { padding: 12px 10px; vertical-align: middle; }
+.o_ems_state_badge { display: inline-block; padding: 4px 8px; border-radius: 20px; background: #f0f2f8; color: #58647c; text-transform: capitalize; }
+.o_ems_readiness { display: flex; align-items: center; gap: 9px; min-width: 130px; }
+.o_ems_readiness .o_ems_bar_track { height: 6px; }
+.o_ems_readiness b { color: #667186; font-size: 11px; }
+
+@media (max-width: 1200px) { .o_ems_kpi_grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 800px) {
+    .o_ems_dashboard_header { align-items: flex-start; flex-direction: column; }
+    .o_ems_dashboard_controls { width: 100%; }
+    .o_ems_dashboard_controls select { flex: 1; min-width: 0; }
+    .o_ems_chart_grid { grid-template-columns: 1fr; }
+    .o_ems_kpi_grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) { .o_ems_kpi_grid { grid-template-columns: 1fr; } }

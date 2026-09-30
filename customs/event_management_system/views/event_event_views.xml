@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_event_form_ems" model="ir.ui.view">
+        <field name="name">event.event.form.ems</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/field[@name='stage_id']" position="before">
+                <button name="action_start_preparation" type="object" string="Start Preparation" class="btn-primary" invisible="management_state != 'draft'" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_coordinator,event_management_system.group_ems_system_admin"/>
+                <button name="action_readiness_review" type="object" string="Readiness Review" class="btn-primary" invisible="management_state != 'preparation'" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_coordinator,event_management_system.group_ems_system_admin"/>
+                <button name="action_go_live" type="object" string="Go Live" class="btn-primary" invisible="management_state != 'readiness'" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_system_admin"/>
+                <button name="action_start_closure" type="object" string="Start Closure" class="btn-primary" invisible="management_state != 'live'" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_system_admin"/>
+                <button name="action_close_event" type="object" string="Close Event" class="btn-primary" invisible="management_state != 'closure'" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_system_admin"/>
+                <button name="action_cancel_management" type="object" string="Cancel" invisible="management_state in ('closed', 'cancelled')" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_system_admin"/>
+                <field name="management_state" widget="statusbar" statusbar_visible="draft,preparation,readiness,live,closure,closed"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_committees" type="object" class="oe_stat_button" icon="fa-sitemap">
+                    <field name="committee_count" widget="statinfo" string="Committees"/>
+                </button>
+                <button name="action_open_activities" type="object" class="oe_stat_button" icon="fa-tasks">
+                    <field name="activity_count" widget="statinfo" string="Activities"/>
+                </button>
+                <button name="action_open_guests" type="object" class="oe_stat_button" icon="fa-address-card" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_guest,event_management_system.group_ems_registration,event_management_system.group_ems_technology,event_management_system.group_ems_system_admin">
+                    <field name="guest_count" widget="statinfo" string="Guests"/>
+                </button>
+                <button name="action_open_badges" type="object" class="oe_stat_button" icon="fa-id-badge" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_registration,event_management_system.group_ems_technology,event_management_system.group_ems_system_admin">
+                    <field name="badge_issued_count" widget="statinfo" string="Badges Issued"/>
+                </button>
+                <button name="action_open_incidents" type="object" class="oe_stat_button" icon="fa-wrench">
+                    <field name="open_incident_count" widget="statinfo" string="Open Incidents"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook/page[@name='tickets']" position="before">
+                <page string="Management" name="ems_management">
+                    <group>
+                        <group string="Readiness">
+                            <field name="readiness_percent" widget="progressbar"/>
+                            <field name="readiness_state" widget="badge" decoration-success="readiness_state == 'ready'" decoration-danger="readiness_state == 'at_risk'" decoration-warning="readiness_state == 'in_progress'"/>
+                            <field name="readiness_alert_active" invisible="1"/><!-- technical flag, set by the readiness notification to avoid duplicate alerts -->
+                            <field name="due_soon_days" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_system_admin"/>
+                        </group>
+                        <group string="Closure">
+                            <field name="attendance_finalized"/>
+                            <field name="reports_collected"/>
+                            <field name="final_report_approved"/>
+                            <field name="closure_override_reason" invisible="not closure_override_reason"/>
+                        </group>
+                    </group>
+                    <group string="Activity Status" col="6">
+                        <field name="activity_not_started_count"/>
+                        <field name="activity_progress_count"/>
+                        <field name="activity_completed_count"/>
+                        <field name="activity_delayed_count"/>
+                        <field name="activity_overdue_count"/>
+                        <field name="activity_due_soon_count"/>
+                    </group>
+                    <notebook>
+                        <page string="Roles" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_system_admin">
+                            <field name="role_assignment_ids">
+                                <list editable="bottom">
+                                    <field name="user_id"/>
+                                    <field name="role"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Final Report">
+                            <field name="final_report"/>
+                            <field name="lessons_learned"/>
+                        </page>
+                    </notebook>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_event_ems_dashboard_kanban" model="ir.ui.view">
+        <field name="name">event.event.ems.dashboard.kanban</field>
+        <field name="model">event.event</field>
+        <field name="priority">5</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard" default_order="date_begin desc">
+                <field name="name"/>
+                <field name="date_begin"/>
+                <field name="date_end"/>
+                <field name="management_state"/>
+                <field name="readiness_percent"/>
+                <field name="readiness_state"/>
+                <field name="committee_count"/>
+                <field name="activity_count"/>
+                <field name="activity_completed_count"/>
+                <field name="activity_overdue_count"/>
+                <field name="guest_confirmed_count"/>
+                <field name="badge_issued_count"/>
+                <field name="checked_in_count"/>
+                <field name="open_incident_count"/>
+                <field name="critical_incident_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <field name="name" class="fw-bold fs-5"/>
+                            <field name="management_state" widget="badge"/>
+                        </div>
+                        <div class="text-muted mb-3"><field name="date_begin"/> - <field name="date_end"/></div>
+                        <div class="mb-2">
+                            <span class="fw-bold">Readiness</span>
+                            <field name="readiness_percent" widget="progressbar"/>
+                            <field name="readiness_state" widget="badge" decoration-success="readiness_state == 'ready'" decoration-danger="readiness_state == 'at_risk'"/>
+                        </div>
+                        <div class="row g-2 text-center">
+                            <div class="col-4"><div class="fw-bold"><field name="committee_count"/></div><small>Committees</small></div>
+                            <div class="col-4"><div class="fw-bold"><field name="activity_completed_count"/>/<field name="activity_count"/></div><small>Activities</small></div>
+                            <div class="col-4"><div class="fw-bold text-danger"><field name="activity_overdue_count"/></div><small>Overdue</small></div>
+                            <div class="col-4"><div class="fw-bold"><field name="guest_confirmed_count"/></div><small>Confirmed</small></div>
+                            <div class="col-4"><div class="fw-bold"><field name="checked_in_count"/></div><small>Checked In</small></div>
+                            <div class="col-4"><div class="fw-bold"><field name="badge_issued_count"/></div><small>Badges</small></div>
+                            <div class="col-6"><div class="fw-bold"><field name="open_incident_count"/></div><small>Open Incidents</small></div>
+                            <div class="col-6"><div class="fw-bold text-danger"><field name="critical_incident_count"/></div><small>Critical</small></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_event_ems_dashboard_list" model="ir.ui.view">
+        <field name="name">event.event.ems.dashboard.list</field>
+        <field name="model">event.event</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-danger="readiness_state == 'at_risk'" decoration-success="readiness_state == 'ready'">
+                <field name="name"/>
+                <field name="management_state" widget="badge"/>
+                <field name="readiness_percent" widget="progressbar"/>
+                <field name="committee_count"/>
+                <field name="activity_count"/>
+                <field name="activity_completed_count"/>
+                <field name="activity_progress_count"/>
+                <field name="activity_not_started_count"/>
+                <field name="activity_delayed_count"/>
+                <field name="activity_overdue_count"/>
+                <field name="guest_confirmed_count"/>
+                <field name="registered_member_count"/>
+                <field name="registered_guest_count"/>
+                <field name="badge_generated_count"/>
+                <field name="badge_printed_count"/>
+                <field name="badge_issued_count"/>
+                <field name="checked_in_count"/>
+                <field name="open_incident_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ems_dashboard" model="ir.actions.act_window">
+        <field name="name">Event Dashboard</field>
+        <field name="res_model">event.event</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="view_event_ems_dashboard_kanban"/>
+        <field name="context">{'search_default_filter_active': 1}</field>
+    </record>
+</odoo>

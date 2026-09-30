@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ems_activity_list" model="ir.ui.view">
+        <field name="name">ems.activity.list</field>
+        <field name="model">ems.activity</field>
+        <field name="arch" type="xml">
+            <list multi_edit="1" decoration-danger="is_overdue or exception == 'issue'" decoration-warning="is_due_soon or exception == 'delayed'" decoration-success="status == 'completed'">
+                <field name="activity_code"/>
+                <field name="name"/>
+                <field name="event_id"/>
+                <field name="committee_id"/>
+                <field name="responsible_id" widget="many2one_avatar_user"/>
+                <field name="priority" widget="badge" decoration-danger="priority == 'high'"/>
+                <field name="phase"/>
+                <field name="start_date" optional="hide"/>
+                <field name="due_date"/>
+                <field name="status" widget="badge" decoration-success="status == 'completed'" decoration-info="status == 'in_progress'"/>
+                <field name="exception" widget="badge" decoration-danger="exception == 'issue'" decoration-warning="exception == 'delayed'"/>
+                <field name="readiness_item" optional="hide"/>
+                <field name="is_overdue" column_invisible="True"/><!-- used by the list decorations to colour overdue rows -->
+                <field name="is_due_soon" column_invisible="True"/><!-- used by the list decorations to colour due-soon rows -->
+                <field name="activity_ids" widget="list_activity"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_ems_activity_form" model="ir.ui.view">
+        <field name="name">ems.activity.form</field>
+        <field name="model">ems.activity</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Start" class="btn-primary" invisible="status != 'not_started'"/>
+                    <button name="action_complete" type="object" string="Complete" class="btn-primary" invisible="status == 'completed'"/>
+                    <button name="action_mark_delayed" type="object" string="Mark Delayed" invisible="status == 'completed' or exception == 'delayed'"/>
+                    <button name="action_mark_issue" type="object" string="Report Issue" invisible="status == 'completed' or exception == 'issue'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><label for="name" string="Activity"/><h1><field name="name"/></h1><div><field name="activity_code" readonly="1"/></div></div>
+                    <group>
+                        <group><field name="event_id"/><field name="committee_id" domain="[('event_id', '=', event_id)]"/><field name="responsible_id" widget="many2one_avatar_user"/></group>
+                        <group><field name="priority"/><field name="phase"/><field name="exception"/><field name="readiness_item"/></group>
+                    </group>
+                    <group><field name="start_date"/><field name="due_date"/><field name="is_overdue" readonly="1"/><field name="is_due_soon" readonly="1"/></group>
+                    <notebook><page string="Description"><field name="description"/></page><page string="Dependencies"><field name="dependency_ids" widget="many2many_tags"/></page><page string="Remarks"><field name="remarks"/></page></notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_ems_activity_kanban" model="ir.ui.view">
+        <field name="name">ems.activity.kanban</field>
+        <field name="model">ems.activity</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" progressbar="status">
+                <field name="name"/><field name="activity_code"/><field name="committee_id"/><field name="responsible_id"/><field name="priority"/><field name="phase"/><field name="due_date"/><field name="exception"/><field name="is_overdue"/>
+                <templates><t t-name="card"><div class="d-flex justify-content-between"><field name="name" class="fw-bold"/><field name="priority" widget="badge"/></div><div class="text-muted"><field name="activity_code"/> | <field name="committee_id"/></div><div><field name="responsible_id" widget="many2one_avatar_user"/></div><div class="mt-2"><i class="fa fa-calendar" title="Due date"/> <field name="due_date"/><field name="exception" widget="badge" class="float-end"/></div></t></templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="view_ems_activity_search" model="ir.ui.view">
+        <field name="name">ems.activity.search</field><field name="model">ems.activity</field>
+        <field name="arch" type="xml"><search><field name="name" filter_domain="['|', ('name', 'ilike', self), ('activity_code', 'ilike', self)]"/><field name="event_id"/><field name="committee_id"/><field name="responsible_id"/><filter name="my_activities" string="My Activities" domain="[('responsible_id', '=', uid)]"/><filter name="overdue" string="Overdue" domain="[('is_overdue', '=', True)]"/><filter name="due_soon" string="Due Soon" domain="[('is_due_soon', '=', True)]"/><filter name="delayed" string="Delayed" domain="[('exception', '=', 'delayed')]"/><filter name="issues" string="Issues" domain="[('exception', '=', 'issue')]"/><filter name="readiness" string="Readiness" domain="[('readiness_item', '=', True)]"/><group><filter name="group_event" string="Event" context="{'group_by': 'event_id'}"/><filter name="group_committee" string="Committee" context="{'group_by': 'committee_id'}"/><filter name="group_phase" string="Phase" context="{'group_by': 'phase'}"/><filter name="group_status" string="Status" context="{'group_by': 'status'}"/></group></search></field>
+    </record>
+    <record id="view_ems_activity_pivot" model="ir.ui.view"><field name="name">ems.activity.pivot</field><field name="model">ems.activity</field><field name="arch" type="xml"><pivot display_quantity="1"><field name="event_id" type="row"/><field name="committee_id" type="row"/><field name="status" type="col"/><field name="phase" type="col"/></pivot></field></record>
+    <record id="view_ems_activity_graph" model="ir.ui.view"><field name="name">ems.activity.graph</field><field name="model">ems.activity</field><field name="arch" type="xml"><graph type="bar"><field name="committee_id"/><field name="status"/></graph></field></record>
+    <record id="action_ems_activity" model="ir.actions.act_window"><field name="name">Activities</field><field name="res_model">ems.activity</field><field name="view_mode">kanban,list,form,pivot,graph</field><field name="search_view_id" ref="view_ems_activity_search"/></record>
+</odoo>

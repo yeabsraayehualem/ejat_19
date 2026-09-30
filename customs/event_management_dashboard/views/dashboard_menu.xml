@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_event_management_overall_dashboard" model="ir.actions.client">
+        <field name="name">Overall Dashboard</field>
+        <field name="tag">event_management_dashboard.overall</field>
+    </record>
+
+    <record id="event_management_system.menu_ems_dashboard" model="ir.ui.menu">
+        <field name="action" ref="action_event_management_overall_dashboard"/>
+    </record>
+</odoo>

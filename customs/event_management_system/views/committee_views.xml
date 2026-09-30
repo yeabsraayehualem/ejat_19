@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ems_committee_list" model="ir.ui.view">
+        <field name="name">ems.committee.list</field>
+        <field name="model">ems.committee</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="overdue_count &gt; 0">
+                <field name="name"/>
+                <field name="event_id"/>
+                <field name="lead_id" widget="many2one_avatar_user"/>
+                <field name="member_user_ids" widget="many2many_tags"/>
+                <field name="activity_count"/>
+                <field name="completed_count"/>
+                <field name="overdue_count"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_ems_committee_form" model="ir.ui.view">
+        <field name="name">ems.committee.form</field>
+        <field name="model">ems.committee</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/><!-- technical field, drives the Archived ribbon only -->
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group><field name="event_id"/><field name="lead_id" widget="many2one_avatar_user"/></group>
+                        <group><field name="activity_count"/><field name="completed_count"/><field name="overdue_count"/></group>
+                    </group>
+                    <notebook>
+                        <page string="Members"><field name="member_user_ids" widget="many2many_tags"/></page>
+                        <page string="Registered Members"><field name="participant_ids"><list><field name="name"/><field name="position"/><field name="email"/><field name="phone"/></list></field></page>
+                        <page string="Activities"><field name="event_activity_ids"><list><field name="activity_code"/><field name="name"/><field name="responsible_id"/><field name="due_date"/><field name="status" widget="badge"/><field name="exception" widget="badge"/></list></field></page>
+                        <page string="Closure Reports"><field name="report_ids"><list><field name="name"/><field name="state" widget="badge"/><field name="submitted_by"/><field name="submitted_on"/></list></field></page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_ems_committee_search" model="ir.ui.view">
+        <field name="name">ems.committee.search</field>
+        <field name="model">ems.committee</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="event_id"/>
+                <field name="lead_id"/>
+                <filter name="my_committees" string="My Committees" domain="['|', ('lead_id', '=', uid), ('member_user_ids', 'in', [uid])]"/>
+                <group><filter name="group_event" string="Event" context="{'group_by': 'event_id'}"/><filter name="group_lead" string="Lead" context="{'group_by': 'lead_id'}"/></group>
+            </search>
+        </field>
+    </record>
+    <record id="action_ems_committee" model="ir.actions.act_window">
+        <field name="name">Committees</field>
+        <field name="res_model">ems.committee</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ems_committee_search"/>
+    </record>
+
+    <record id="view_ems_committee_report_list" model="ir.ui.view">
+        <field name="name">ems.committee.report.list</field>
+        <field name="model">ems.committee.report</field>
+        <field name="arch" type="xml"><list><field name="name"/><field name="event_id"/><field name="committee_id"/><field name="state" widget="badge"/><field name="submitted_by"/><field name="submitted_on"/></list></field>
+    </record>
+    <record id="view_ems_committee_report_form" model="ir.ui.view">
+        <field name="name">ems.committee.report.form</field>
+        <field name="model">ems.committee.report</field>
+        <field name="arch" type="xml">
+            <form>
+                <header><button name="action_submit" type="object" string="Submit" class="btn-primary" invisible="state != 'draft'"/><button name="action_accept" type="object" string="Accept" class="btn-primary" invisible="state != 'submitted'" groups="base.group_system,event_management_system.group_ems_event_admin,event_management_system.group_ems_system_admin"/><field name="state" widget="statusbar"/></header>
+                <sheet><div class="oe_title"><h1><field name="name"/></h1></div><group><field name="event_id"/><field name="committee_id" domain="[('event_id', '=', event_id)]"/><field name="submitted_by"/><field name="submitted_on"/></group><notebook><page string="Summary"><field name="summary"/></page><page string="Lessons Learned"><field name="lessons_learned"/></page></notebook></sheet><chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_ems_committee_report" model="ir.actions.act_window">
+        <field name="name">Committee Reports</field><field name="res_model">ems.committee.report</field><field name="view_mode">list,form</field>
+    </record>
+</odoo>

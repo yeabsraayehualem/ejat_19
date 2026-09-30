@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_ems_event_assigned" model="ir.rule">
+        <field name="name">Events assigned to operational role</field>
+        <field name="model_id" ref="event.model_event_event"/>
+        <field name="domain_force">[('role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_coordinator')), (4, ref('group_ems_technology')), (4, ref('group_ems_registration')), (4, ref('group_ems_guest')), (4, ref('group_ems_viewer'))]"/>
+    </record>
+    <record id="rule_ems_event_committee_lead" model="ir.rule">
+        <field name="name">Events for committee leads</field>
+        <field name="model_id" ref="event.model_event_event"/>
+        <field name="domain_force">[('committee_ids.lead_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_ems_committee_lead'))]"/>
+    </record>
+    <record id="rule_ems_event_committee_member" model="ir.rule">
+        <field name="name">Events for committee members</field>
+        <field name="model_id" ref="event.model_event_event"/>
+        <field name="domain_force">[('committee_ids.member_user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_committee_member'))]"/>
+    </record>
+
+    <record id="rule_ems_role_assigned_event" model="ir.rule">
+        <field name="name">Event roles in assigned events</field>
+        <field name="model_id" ref="model_ems_event_role"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_coordinator')), (4, ref('group_ems_technology')), (4, ref('group_ems_registration')), (4, ref('group_ems_guest')), (4, ref('group_ems_viewer'))]"/>
+    </record>
+
+    <record id="rule_ems_committee_central" model="ir.rule">
+        <field name="name">Committees in assigned events</field>
+        <field name="model_id" ref="model_ems_committee"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_coordinator')), (4, ref('group_ems_viewer'))]"/>
+    </record>
+    <record id="rule_ems_committee_lead" model="ir.rule">
+        <field name="name">Own led committees</field>
+        <field name="model_id" ref="model_ems_committee"/>
+        <field name="domain_force">[('lead_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_ems_committee_lead'))]"/>
+    </record>
+    <record id="rule_ems_committee_member" model="ir.rule">
+        <field name="name">Own member committees</field>
+        <field name="model_id" ref="model_ems_committee"/>
+        <field name="domain_force">[('member_user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_committee_member'))]"/>
+    </record>
+
+    <record id="rule_ems_activity_central" model="ir.rule">
+        <field name="name">Activities in assigned events</field>
+        <field name="model_id" ref="model_ems_activity"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_coordinator')), (4, ref('group_ems_technology')), (4, ref('group_ems_viewer'))]"/>
+    </record>
+    <record id="rule_ems_activity_lead" model="ir.rule">
+        <field name="name">Activities in led committees</field>
+        <field name="model_id" ref="model_ems_activity"/>
+        <field name="domain_force">[('committee_id.lead_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_ems_committee_lead'))]"/>
+    </record>
+    <record id="rule_ems_activity_member" model="ir.rule">
+        <field name="name">Assigned committee member activities</field>
+        <field name="model_id" ref="model_ems_activity"/>
+        <field name="domain_force">[('responsible_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_ems_committee_member'))]"/>
+    </record>
+
+    <record id="rule_ems_member_central" model="ir.rule">
+        <field name="name">Members in assigned events</field>
+        <field name="model_id" ref="model_ems_member"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_coordinator')), (4, ref('group_ems_technology')), (4, ref('group_ems_registration'))]"/>
+    </record>
+    <record id="rule_ems_member_lead" model="ir.rule">
+        <field name="name">Members in led committees</field>
+        <field name="model_id" ref="model_ems_member"/>
+        <field name="domain_force">[('committee_id.lead_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_ems_committee_lead'))]"/>
+    </record>
+    <record id="rule_ems_member_user" model="ir.rule">
+        <field name="name">Own event member profile</field>
+        <field name="model_id" ref="model_ems_member"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_ems_committee_member'))]"/>
+    </record>
+
+    <record id="rule_ems_guest_central" model="ir.rule">
+        <field name="name">Guests in assigned events</field>
+        <field name="model_id" ref="model_ems_guest"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_technology')), (4, ref('group_ems_registration')), (4, ref('group_ems_guest'))]"/>
+    </record>
+    <record id="rule_ems_registration_central" model="ir.rule">
+        <field name="name">Registrations in assigned events</field>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_technology')), (4, ref('group_ems_registration')), (4, ref('group_ems_guest'))]"/>
+    </record>
+
+    <record id="rule_ems_badge_central" model="ir.rule">
+        <field name="name">Badges in assigned events</field>
+        <field name="model_id" ref="model_ems_badge"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_technology')), (4, ref('group_ems_registration'))]"/>
+    </record>
+    <record id="rule_ems_checkin_central" model="ir.rule">
+        <field name="name">Check-ins in assigned events</field>
+        <field name="model_id" ref="model_ems_checkin_log"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_technology')), (4, ref('group_ems_registration'))]"/>
+    </record>
+    <record id="rule_ems_incident_central" model="ir.rule">
+        <field name="name">Incidents in assigned events</field>
+        <field name="model_id" ref="model_ems_incident"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_coordinator')), (4, ref('group_ems_technology')), (4, ref('group_ems_viewer'))]"/>
+    </record>
+    <record id="rule_ems_report_central" model="ir.rule">
+        <field name="name">Committee reports in assigned events</field>
+        <field name="model_id" ref="model_ems_committee_report"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_coordinator')), (4, ref('group_ems_viewer'))]"/>
+    </record>
+    <record id="rule_ems_report_lead" model="ir.rule">
+        <field name="name">Reports for led committees</field>
+        <field name="model_id" ref="model_ems_committee_report"/>
+        <field name="domain_force">[('committee_id.lead_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_ems_committee_lead'))]"/>
+    </record>
+    <record id="rule_ems_audit_central" model="ir.rule">
+        <field name="name">Audit logs in assigned events</field>
+        <field name="model_id" ref="model_ems_audit_log"/>
+        <field name="domain_force">[('event_id.role_assignment_ids', 'any', [('user_id', '=', user.id), ('active', '=', True)])]</field>
+        <field name="groups" eval="[(4, ref('group_ems_event_admin'))]"/>
+    </record>
+
+    <record id="rule_ems_committee_company" model="ir.rule">
+        <field name="name">Committee multi-company</field>
+        <field name="model_id" ref="model_ems_committee"/>
+        <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="rule_ems_activity_company" model="ir.rule">
+        <field name="name">Activity multi-company</field>
+        <field name="model_id" ref="model_ems_activity"/>
+        <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="rule_ems_participant_company" model="ir.rule">
+        <field name="name">Member multi-company</field>
+        <field name="model_id" ref="model_ems_member"/>
+        <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="rule_ems_guest_company" model="ir.rule">
+        <field name="name">Guest multi-company</field>
+        <field name="model_id" ref="model_ems_guest"/>
+        <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="rule_ems_badge_company" model="ir.rule">
+        <field name="name">Badge multi-company</field>
+        <field name="model_id" ref="model_ems_badge"/>
+        <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="rule_ems_incident_company" model="ir.rule">
+        <field name="name">Incident multi-company</field>
+        <field name="model_id" ref="model_ems_incident"/>
+        <field name="domain_force">[('event_id.company_id', 'in', company_ids + [False])]</field>
+    </record>
+</odoo>

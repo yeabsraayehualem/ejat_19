@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:17
+    container_name: ejat_19_db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=ejat_19
+      - POSTGRES_PASSWORD=ejat_19
+    ports:
+      - "9410:5432"
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    restart: always
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ejat_19
+    depends_on:
+      - db
+    ports:
+      - "9983:8069"
+    volumes:
+      - ./odoo_data:/var/lib/odoo
+    restart: always
+    environment:
+          - POSTGRES_DB=postgres
+          - POSTGRES_PASSWORD=ejat_19
+          - POSTGRES_USER=ejat_19
+          - PGDATA=/var/lib/postgresql/data/pgdata
+
+

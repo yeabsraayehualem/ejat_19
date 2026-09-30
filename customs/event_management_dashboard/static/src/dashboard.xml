@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="event_management_dashboard.OverallDashboard">
+        <div class="o_ems_dashboard">
+            <div class="o_ems_dashboard_header">
+                <div>
+                    <div class="o_ems_eyebrow">EVENT OPERATIONS</div>
+                    <h1>Overall Dashboard</h1>
+                    <p>One view of planning, participation, attendance, badges, and technical support.</p>
+                </div>
+                <div class="o_ems_dashboard_controls">
+                    <select class="form-select" t-on-change="onEventChange" aria-label="Filter by event">
+                        <option value="">All accessible events</option>
+                        <t t-foreach="state.data?.events || []" t-as="event" t-key="event.id">
+                            <option t-att-value="event.id" t-att-selected="state.eventId === event.id"><t t-esc="event.name"/></option>
+                        </t>
+                    </select>
+                    <button class="btn btn-outline-secondary" t-on-click="refresh" title="Refresh dashboard">
+                        <i class="fa fa-refresh"/> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div t-if="state.loading" class="o_ems_loading"><i class="fa fa-spinner fa-spin"/> Loading dashboard…</div>
+            <div t-elif="state.error" class="alert alert-danger" role="alert"><t t-esc="state.error"/></div>
+            <t t-elif="state.data">
+                <div class="o_ems_kpi_grid">
+                    <t t-foreach="kpiCards" t-as="card" t-key="card.label">
+                        <div class="o_ems_kpi_card">
+                            <div t-attf-class="o_ems_kpi_icon tone-{{card.tone}}"><i t-attf-class="fa {{card.icon}}"/></div>
+                            <div class="o_ems_kpi_text"><span><t t-esc="card.label"/></span><strong><t t-esc="card.value"/></strong><small t-if="card.note"><t t-esc="card.note"/></small></div>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="o_ems_chart_grid">
+                    <section class="o_ems_panel">
+                        <div class="o_ems_panel_heading"><div><h2>Activity Progress</h2><p>Work status across committees</p></div><span class="o_ems_panel_icon"><i class="fa fa-tasks"/></span></div>
+                        <t t-foreach="state.data.activity_chart" t-as="row" t-key="row.label">
+                            <div class="o_ems_bar_row"><div class="o_ems_bar_label"><span t-esc="row.label"/><b t-esc="row.value"/></div><div class="o_ems_bar_track"><div class="o_ems_bar_fill fill-blue" t-att-style="'width: ' + row.percent + '%'"/></div></div>
+                        </t>
+                    </section>
+                    <section class="o_ems_panel">
+                        <div class="o_ems_panel_heading"><div><h2>Guest Invitations</h2><p>Confirmation status</p></div><span class="o_ems_panel_icon"><i class="fa fa-envelope-o"/></span></div>
+                        <t t-foreach="state.data.invitation_chart" t-as="row" t-key="row.label">
+                            <div class="o_ems_bar_row"><div class="o_ems_bar_label"><span t-esc="row.label"/><b t-esc="row.value"/></div><div class="o_ems_bar_track"><div class="o_ems_bar_fill fill-purple" t-att-style="'width: ' + row.percent + '%'"/></div></div>
+                        </t>
+                    </section>
+                    <section class="o_ems_panel">
+                        <div class="o_ems_panel_heading"><div><h2>Badge Pipeline</h2><p>Generation through issuance</p></div><span class="o_ems_panel_icon"><i class="fa fa-id-badge"/></span></div>
+                        <t t-foreach="state.data.badge_chart" t-as="row" t-key="row.label">
+                            <div class="o_ems_bar_row"><div class="o_ems_bar_label"><span t-esc="row.label"/><b t-esc="row.value"/></div><div class="o_ems_bar_track"><div class="o_ems_bar_fill fill-teal" t-att-style="'width: ' + row.percent + '%'"/></div></div>
+                        </t>
+                    </section>
+                    <section class="o_ems_panel">
+                        <div class="o_ems_panel_heading"><div><h2>Open Incidents</h2><p>Open issues by priority</p></div><span class="o_ems_panel_icon"><i class="fa fa-wrench"/></span></div>
+                        <t t-foreach="state.data.incident_chart" t-as="row" t-key="row.label">
+                            <div class="o_ems_bar_row"><div class="o_ems_bar_label"><span t-esc="row.label"/><b t-esc="row.value"/></div><div class="o_ems_bar_track"><div t-attf-class="o_ems_bar_fill {{row.label === 'Critical' ? 'fill-red' : 'fill-orange'}}" t-att-style="'width: ' + row.percent + '%'"/></div></div>
+                        </t>
+                    </section>
+                </div>
+
+                <section class="o_ems_panel o_ems_events_panel">
+                    <div class="o_ems_panel_heading"><div><h2>Recent Events</h2><p>Lifecycle and readiness snapshot</p></div></div>
+                    <div t-if="!state.data.recent_events.length" class="o_ems_empty">No events are available in your access scope.</div>
+                    <div t-else="" class="table-responsive">
+                        <table class="table o_ems_events_table"><thead><tr><th>Event</th><th>Starts</th><th>Lifecycle</th><th>Readiness</th><th>Progress</th></tr></thead>
+                            <tbody><tr t-foreach="state.data.recent_events" t-as="event" t-key="event.id"><td class="fw-semibold" t-esc="event.name"/><td t-esc="event.date_begin || '—'"/><td><span class="o_ems_state_badge" t-esc="event.management_state.replaceAll('_', ' ')"/></td><td><span t-esc="event.readiness_state.replaceAll('_', ' ')"/></td><td><div class="o_ems_readiness"><div class="o_ems_bar_track"><div class="o_ems_bar_fill fill-green" t-att-style="'width: ' + event.readiness_percent + '%'"/></div><b t-esc="event.readiness_percent + '%'"/></div></td></tr></tbody>
+                        </table>
+                    </div>
+                </section>
+            </t>
+        </div>
+    </t>
+</templates>

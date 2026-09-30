@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ems_member_list" model="ir.ui.view">
+        <field name="name">ems.member.list</field><field name="model">ems.member</field>
+        <field name="arch" type="xml"><list><field name="name"/><field name="event_id"/><field name="committee_id"/><field name="organization"/><field name="position"/><field name="email"/><field name="phone"/><field name="registration_count"/></list></field>
+    </record>
+    <record id="view_ems_member_form" model="ir.ui.view">
+        <field name="name">ems.member.form</field><field name="model">ems.member</field>
+        <field name="arch" type="xml"><form><header><button name="action_register" type="object" string="Register" class="btn-primary"/></header><sheet><widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="active"/><field name="active" invisible="1"/><!-- technical field, drives the Archived ribbon only --><div class="oe_title"><h1><field name="name"/></h1></div><group><group><field name="event_id"/><field name="committee_id" domain="[('event_id', '=', event_id)]"/><field name="user_id"/></group><group><field name="organization"/><field name="position"/><field name="email"/><field name="phone"/></group></group><notebook><page string="Registrations"><field name="registration_ids"><list><field name="barcode"/><field name="state" widget="badge"/><field name="date_closed"/></list></field></page><page string="Badges"><field name="badge_ids"><list><field name="badge_code"/><field name="category_id"/><field name="status" widget="badge"/></list></field></page></notebook></sheet><chatter/></form></field>
+    </record>
+    <record id="view_ems_member_search" model="ir.ui.view">
+        <field name="name">ems.member.search</field><field name="model">ems.member</field>
+        <field name="arch" type="xml"><search><field name="name" filter_domain="['|', '|', ('name', 'ilike', self), ('email', 'ilike', self), ('phone', 'ilike', self)]"/><field name="event_id"/><field name="committee_id"/><group><filter name="group_event" string="Event" context="{'group_by': 'event_id'}"/><filter name="group_committee" string="Committee" context="{'group_by': 'committee_id'}"/></group></search></field>
+    </record>
+    <record id="action_ems_member" model="ir.actions.act_window"><field name="name">Members</field><field name="res_model">ems.member</field><field name="view_mode">list,form</field><field name="search_view_id" ref="view_ems_member_search"/></record>
+
+    <record id="view_ems_guest_list" model="ir.ui.view">
+        <field name="name">ems.guest.list</field><field name="model">ems.guest</field>
+        <field name="arch" type="xml"><list decoration-success="invitation_status == 'confirmed'" decoration-muted="invitation_status == 'declined'"><field name="name"/><field name="event_id"/><field name="organization"/><field name="position"/><field name="phone"/><field name="email"/><field name="category" widget="badge"/><field name="invitation_status" widget="badge" decoration-success="invitation_status == 'confirmed'" decoration-danger="invitation_status == 'declined'"/><field name="accompanying_of_id" optional="hide"/></list></field>
+    </record>
+    <record id="view_ems_guest_form" model="ir.ui.view">
+        <field name="name">ems.guest.form</field><field name="model">ems.guest</field>
+        <field name="arch" type="xml"><form><header><button name="action_invite" type="object" string="Send Invitation" class="btn-primary" invisible="invitation_status != 'draft'"/><button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="invitation_status in ('confirmed', 'declined')"/><button name="action_decline" type="object" string="Decline" invisible="invitation_status == 'declined'"/><button name="action_register" type="object" string="Register" invisible="invitation_status != 'confirmed'"/><field name="invitation_status" widget="statusbar" statusbar_visible="draft,invited,pending,confirmed,declined"/></header><sheet><widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="active"/><field name="active" invisible="1"/><!-- technical field, drives the Archived ribbon only --><div class="oe_title"><h1><field name="name"/></h1></div><group><group><field name="event_id"/><field name="category"/><field name="organization"/><field name="position"/></group><group><field name="phone"/><field name="email"/><field name="accompanying_of_id" domain="[('event_id', '=', event_id), ('id', '!=', id)]"/><field name="invited_on"/><field name="responded_on"/></group></group><notebook><page string="Accompanying Guests"><field name="accompanying_guest_ids"><list><field name="name"/><field name="organization"/><field name="invitation_status" widget="badge"/></list></field></page><page string="Registration"><field name="registration_ids"><list><field name="barcode"/><field name="state" widget="badge"/><field name="date_closed"/></list></field></page><page string="Badges"><field name="badge_ids"><list><field name="badge_code"/><field name="category_id"/><field name="status" widget="badge"/></list></field></page></notebook></sheet><chatter/></form></field>
+    </record>
+    <record id="view_ems_guest_search" model="ir.ui.view">
+        <field name="name">ems.guest.search</field><field name="model">ems.guest</field>
+        <field name="arch" type="xml"><search><field name="name" filter_domain="['|', '|', '|', ('name', 'ilike', self), ('organization', 'ilike', self), ('email', 'ilike', self), ('phone', 'ilike', self)]"/><field name="event_id"/><filter name="confirmed" string="Confirmed Guest List" domain="[('invitation_status', '=', 'confirmed')]"/><filter name="pending" string="Pending" domain="[('invitation_status', 'in', ['invited', 'pending'])]"/><filter name="declined" string="Declined" domain="[('invitation_status', '=', 'declined')]"/><group><filter name="group_event" string="Event" context="{'group_by': 'event_id'}"/><filter name="group_status" string="Invitation Status" context="{'group_by': 'invitation_status'}"/><filter name="group_category" string="Category" context="{'group_by': 'category'}"/></group></search></field>
+    </record>
+    <record id="view_ems_guest_pivot" model="ir.ui.view"><field name="name">ems.guest.pivot</field><field name="model">ems.guest</field><field name="arch" type="xml"><pivot display_quantity="1"><field name="event_id" type="row"/><field name="invitation_status" type="col"/><field name="category" type="col"/></pivot></field></record>
+    <record id="view_ems_guest_graph" model="ir.ui.view"><field name="name">ems.guest.graph</field><field name="model">ems.guest</field><field name="arch" type="xml"><graph type="bar"><field name="event_id"/><field name="invitation_status"/></graph></field></record>
+    <record id="action_ems_guest" model="ir.actions.act_window"><field name="name">Guests &amp; Invitations</field><field name="res_model">ems.guest</field><field name="view_mode">list,form,pivot,graph</field><field name="search_view_id" ref="view_ems_guest_search"/></record>
+
+    <record id="view_event_registration_form_ems" model="ir.ui.view">
+        <field name="name">event.registration.form.ems</field><field name="model">event.registration</field><field name="inherit_id" ref="event.view_event_registration_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='event']" position="inside"><field name="ems_member_id" domain="[('event_id', '=', event_id)]"/><field name="ems_guest_id" domain="[('event_id', '=', event_id)]"/></xpath>
+            <xpath expr="//notebook" position="inside"><page string="Badge &amp; Check-in"><field name="ems_badge_ids"><list><field name="badge_code"/><field name="category_id"/><field name="status" widget="badge"/></list></field><field name="ems_checkin_log_ids" readonly="1"><list create="false" delete="false"><field name="create_date"/><field name="method"/><field name="result" widget="badge"/><field name="user_id"/><field name="reason"/></list></field></page></xpath>
+        </field>
+    </record>
+    <record id="view_event_registration_list_ems" model="ir.ui.view">
+        <field name="name">event.registration.list.ems</field><field name="model">event.registration</field><field name="inherit_id" ref="event.view_event_registration_tree"/>
+        <field name="arch" type="xml"><field name="company_name" position="after"><field name="ems_member_id" optional="hide"/><field name="ems_guest_id" optional="hide"/></field></field>
+    </record>
+    <record id="view_event_registration_search_ems" model="ir.ui.view">
+        <field name="name">event.registration.search.ems</field><field name="model">event.registration</field><field name="inherit_id" ref="event.view_registration_search"/>
+        <field name="arch" type="xml"><field name="id" position="after"><field name="barcode" string="QR / Badge ID"/><field name="ems_member_id"/><field name="ems_guest_id"/></field></field>
+    </record>
+
+    <record id="view_ems_checkin_log_list" model="ir.ui.view"><field name="name">ems.checkin.log.list</field><field name="model">ems.checkin.log</field><field name="arch" type="xml"><list create="false" delete="false"><field name="create_date"/><field name="event_id"/><field name="registration_id"/><field name="method"/><field name="result" widget="badge" decoration-danger="result in ('duplicate_blocked', 'invalid')" decoration-success="result in ('accepted', 'reentry')"/><field name="user_id"/><field name="reason"/><field name="previous_datetime"/></list></field></record>
+    <record id="action_ems_checkin_log" model="ir.actions.act_window"><field name="name">Attendance &amp; Check-in Log</field><field name="res_model">ems.checkin.log</field><field name="view_mode">list</field></record>
+</odoo>

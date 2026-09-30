@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_ems_badge" model="ir.actions.report">
+        <field name="name">Event Badge</field>
+        <field name="model">ems.badge</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">event_management_system.report_ems_badge</field>
+        <field name="report_file">event_management_system.report_ems_badge</field>
+        <field name="binding_model_id" ref="model_ems_badge"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Badge - %s' % (object.participant_name or object.badge_code)</field>
+        <field name="group_ids" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_technology')), (4, ref('group_ems_registration')), (4, ref('group_ems_system_admin'))]"/>
+    </record>
+
+    <template id="report_ems_badge">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="text-align:center; padding:24px; border:8px solid #1f4e5f; min-height:480px;">
+                    <div style="font-size:18px; text-transform:uppercase; letter-spacing:2px; color:#1f4e5f;" t-out="o.event_id.name"/>
+                    <div style="font-size:34px; font-weight:bold; margin-top:30px;" t-out="o.participant_name"/>
+                    <div style="font-size:20px; margin:8px 0;" t-out="o.category_id.name"/>
+                    <div t-if="o.member_id" style="font-size:16px;" t-out="o.member_id.committee_id.name"/>
+                    <div t-if="o.guest_id.organization" style="font-size:16px;" t-out="o.guest_id.organization"/>
+                    <div style="margin:28px auto 12px;">
+                        <img t-att-src="image_data_uri(o.qr_image)" style="width:190px; height:190px;" alt="QR Code"/>
+                    </div>
+                    <div style="font-family:monospace; font-size:13px;" t-out="o.badge_code"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_ems_final_event" model="ir.actions.report">
+        <field name="name">Final Event Report</field>
+        <field name="model">event.event</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">event_management_system.report_ems_final_event</field>
+        <field name="report_file">event_management_system.report_ems_final_event</field>
+        <field name="binding_model_id" ref="event.model_event_event"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Final Event Report - %s' % object.name</field>
+        <field name="group_ids" eval="[(4, ref('group_ems_event_admin')), (4, ref('group_ems_coordinator')), (4, ref('group_ems_viewer')), (4, ref('group_ems_system_admin'))]"/>
+    </record>
+
+    <template id="report_ems_final_event">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h1 t-out="o.name"/>
+                        <h3>Final Event Report</h3>
+                        <p><strong>Period:</strong> <span t-field="o.date_begin"/> - <span t-field="o.date_end"/></p>
+                        <p><strong>Lifecycle:</strong> <span t-field="o.management_state"/> | <strong>Readiness:</strong> <span t-out="'%.1f' % o.readiness_percent"/>% (<span t-field="o.readiness_state"/>)</p>
+
+                        <h4>Executive Dashboard</h4>
+                        <table class="table table-sm table-bordered">
+                            <tbody>
+                                <tr><th>Committees</th><td t-out="o.committee_count"/><th>Total Activities</th><td t-out="o.activity_count"/></tr>
+                                <tr><th>Completed</th><td t-out="o.activity_completed_count"/><th>In Progress</th><td t-out="o.activity_progress_count"/></tr>
+                                <tr><th>Not Started</th><td t-out="o.activity_not_started_count"/><th>Delayed / Overdue</th><td><span t-out="o.activity_delayed_count"/> / <span t-out="o.activity_overdue_count"/></td></tr>
+                                <tr><th>Guests / Confirmed</th><td><span t-out="o.guest_count"/> / <span t-out="o.guest_confirmed_count"/></td><th>Members / Guests Registered</th><td><span t-out="o.registered_member_count"/> / <span t-out="o.registered_guest_count"/></td></tr>
+                                <tr><th>Badges Generated / Printed / Issued</th><td><span t-out="o.badge_generated_count"/> / <span t-out="o.badge_printed_count"/> / <span t-out="o.badge_issued_count"/></td><th>Participants Checked In</th><td t-out="o.checked_in_count"/></tr>
+                                <tr><th>Open Incidents</th><td t-out="o.open_incident_count"/><th>Open Critical Incidents</th><td t-out="o.critical_incident_count"/></tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Committee Activity</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Committee</th><th>Lead</th><th>Activities</th><th>Completed</th><th>Overdue</th></tr></thead>
+                            <tbody><tr t-foreach="o.committee_ids" t-as="committee"><td t-out="committee.name"/><td t-out="committee.lead_id.name"/><td t-out="committee.activity_count"/><td t-out="committee.completed_count"/><td t-out="committee.overdue_count"/></tr></tbody>
+                        </table>
+
+                        <h4>Technical Incident Summary</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>ID</th><th>Location</th><th>Priority</th><th>Status</th><th>Resolution</th></tr></thead>
+                            <tbody><tr t-foreach="o.incident_ids" t-as="incident"><td t-out="incident.incident_code"/><td t-out="incident.location"/><td><span t-field="incident.priority"/></td><td><span t-field="incident.status"/></td><td t-out="incident.resolution or ''"/></tr></tbody>
+                        </table>
+
+                        <h4>Committee Reports</h4>
+                        <table class="table table-sm"><thead><tr><th>Committee</th><th>Status</th><th>Submitted</th></tr></thead><tbody><tr t-foreach="o.committee_report_ids" t-as="report"><td t-out="report.committee_id.name"/><td><span t-field="report.state"/></td><td><span t-field="report.submitted_on"/></td></tr></tbody></table>
+
+                        <h4>Lessons Learned</h4>
+                        <div t-field="o.lessons_learned"/>
+                        <h4>Final Summary</h4>
+                        <div t-field="o.final_report"/>
+                        <p><strong>Attendance finalized:</strong> <span t-out="'Yes' if o.attendance_finalized else 'No'"/> | <strong>Reports collected:</strong> <span t-out="'Yes' if o.reports_collected else 'No'"/> | <strong>Approved:</strong> <span t-out="'Yes' if o.final_report_approved else 'No'"/></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_ems_committee_closure" model="ir.actions.report">
+        <field name="name">Committee Closure Report</field>
+        <field name="model">ems.committee.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">event_management_system.report_ems_committee_closure</field>
+        <field name="report_file">event_management_system.report_ems_committee_closure</field>
+        <field name="binding_model_id" ref="model_ems_committee_report"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Committee Report - %s' % object.committee_id.name</field>
+    </record>
+    <template id="report_ems_committee_closure">
+        <t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-call="web.external_layout"><div class="page"><h1 t-out="o.event_id.name"/><h3 t-out="o.committee_id.name"/><p><strong>Status:</strong> <span t-field="o.state"/> | <strong>Submitted by:</strong> <span t-out="o.submitted_by.name or ''"/> | <span t-field="o.submitted_on"/></p><h4>Summary</h4><div t-field="o.summary"/><h4>Lessons Learned</h4><div t-field="o.lessons_learned"/></div></t></t></t>
+    </template>
+</odoo>

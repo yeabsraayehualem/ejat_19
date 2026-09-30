@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        The nine roles below implement the access model of the requirements document.
+
+        Note on the standard Odoo administrator: security/ir.model.access.csv also grants
+        full access to "base.group_system" (Settings), and the menus/buttons in views/ add
+        "base.group_system" to their groups. This means a normal Odoo administrator can use
+        every feature of the module out of the box, which matches the requirement
+        "System Administrator - Entire system - Users, roles, settings, full access".
+    -->
+    <record id="privilege_event_management" model="res.groups.privilege">
+        <field name="name">Event Management</field>
+        <field name="sequence">19</field>
+        <field name="category_id" ref="base.module_category_marketing"/>
+    </record>
+
+    <record id="group_ems_committee_member" model="res.groups">
+        <field name="name">Committee Member</field>
+        <field name="sequence">10</field>
+        <field name="privilege_id" ref="privilege_event_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_ems_committee_lead" model="res.groups">
+        <field name="name">Committee Lead</field>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="privilege_event_management"/>
+        <field name="implied_ids" eval="[(4, ref('group_ems_committee_member'))]"/>
+    </record>
+    <record id="group_ems_guest" model="res.groups">
+        <field name="name">Guest Management Team</field>
+        <field name="sequence">30</field>
+        <field name="privilege_id" ref="privilege_event_management"/>
+        <field name="implied_ids" eval="[(4, ref('event.group_event_registration_desk'))]"/>
+    </record>
+    <record id="group_ems_registration" model="res.groups">
+        <field name="name">Registration Officer</field>
+        <field name="sequence">40</field>
+        <field name="privilege_id" ref="privilege_event_management"/>
+        <field name="implied_ids" eval="[(4, ref('event.group_event_registration_desk'))]"/>
+    </record>
+    <record id="group_ems_technology" model="res.groups">
+        <field name="name">Digital Technology Lead</field>
+        <field name="sequence">50</field>
+        <field name="privilege_id" ref="privilege_event_management"/>
+        <field name="implied_ids" eval="[(4, ref('event.group_event_registration_desk'))]"/>
+    </record>
+    <record id="group_ems_coordinator" model="res.groups">
+        <field name="name">Event Coordinator</field>
+        <field name="sequence">60</field>
+        <field name="privilege_id" ref="privilege_event_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_ems_viewer" model="res.groups">
+        <field name="name">Management / Viewer</field>
+        <field name="sequence">70</field>
+        <field name="privilege_id" ref="privilege_event_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_ems_event_admin" model="res.groups">
+        <field name="name">Event Administrator</field>
+        <field name="sequence">80</field>
+        <field name="privilege_id" ref="privilege_event_management"/>
+        <field name="implied_ids" eval="[(4, ref('event.group_event_manager'))]"/>
+    </record>
+    <record id="group_ems_system_admin" model="res.groups">
+        <field name="name">System Administrator</field>
+        <field name="sequence">90</field>
+        <field name="privilege_id" ref="privilege_event_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_system')), (4, ref('event.group_event_manager'))]"/>
+    </record>
+</odoo>
